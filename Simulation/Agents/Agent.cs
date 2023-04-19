@@ -11,6 +11,10 @@ public abstract class Agent
     {
         throw new NotImplementedException();
     }
-    
+
+    public virtual void MoveAgentInSpace(int x, int y)
+    {
+    }
+
     public int Id { get; set; }
 }

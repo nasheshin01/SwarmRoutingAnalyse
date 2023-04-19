@@ -7,10 +7,24 @@ public class Drone : Agent
         X = x;
         Y = y;
 
-        DataLoadingProcesses = new Queue<DataLoadingProcess>();
+        DataLoadingProcesses = new List<DataLoadingProcess>();
+    }
+
+    public virtual void DoAction(GridSpace grid)
+    {
+        var dx = new Random().Next(-1, 2);
+        var dy = new Random().Next(-1, 2);
+        grid.MoveAgent(this, X + dx, Y + dy);
+    }
+
+    public override void MoveAgentInSpace(int x, int y)
+    {
+        base.MoveAgentInSpace(x, y);
+        X = x;
+        Y = y;
     }
 
     public int X { get; set; }
     public int Y { get; set; }
-    public Queue<DataLoadingProcess> DataLoadingProcesses { get; set; }
+    public List<DataLoadingProcess> DataLoadingProcesses { get; set; }
 }

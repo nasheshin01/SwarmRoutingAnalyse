@@ -1,0 +1,31 @@
+﻿<Window x:Class="WpfApp1.AddRuleWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Add Rule" Height="300" Width="400">
+    <Grid>
+        <Label Content="Agent Type:" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
+        <ComboBox x:Name="cmbAgentType" HorizontalAlignment="Left" Margin="120,10,0,0" VerticalAlignment="Top" Width="200">
+            <ComboBoxItem Content="Scout"/>
+            <ComboBoxItem Content="Drone"/>
+            <ComboBoxItem Content="Worker"/>
+        </ComboBox>
+        <Label Content="Variable:" HorizontalAlignment="Left" Margin="10,50,0,0" VerticalAlignment="Top"/>
+        <ComboBox x:Name="cmbVariable" HorizontalAlignment="Left" Margin="120,50,0,0" VerticalAlignment="Top" Width="200">
+            <ComboBoxItem Content="Energy"/>
+        </ComboBox>
+        <Label Content="Equation:" HorizontalAlignment="Left" Margin="10,90,0,0" VerticalAlignment="Top"/>
+        <ComboBox x:Name="cmbEquation" HorizontalAlignment="Left" Margin="120,90,0,0" VerticalAlignment="Top" Width="200">
+            <ComboBoxItem Content="Equal"/>
+            <ComboBoxItem Content="Greater Than"/>
+            <ComboBoxItem Content="Less Than"/>
+        </ComboBox>
+        <Label Content="Constant:" HorizontalAlignment="Left" Margin="10,130,0,0" VerticalAlignment="Top"/>
+        <TextBox x:Name="txtConstant" HorizontalAlignment="Left" Margin="120,130,0,0" VerticalAlignment="Top" Width="200"/>
+        <Label Content="Action:" HorizontalAlignment="Left" Margin="10,170,0,0" VerticalAlignment="Top"/>
+        <ComboBox x:Name="cmbAction" HorizontalAlignment="Left" Margin="120,170,0,0" VerticalAlignment="Top" Width="200">
+            <ComboBoxItem Content="Move"/>
+        </ComboBox>
+        <Button Content="Add Rule" HorizontalAlignment="Left" Margin="10,210,0,0" VerticalAlignment="Top" Width="100" Click="BtnAddRule_Click"/>
+        <Button Content="Cancel" HorizontalAlignment="Right" Margin="0,210,10,0" VerticalAlignment="Top" Width="100" Click="BtnCancel_Click"/>
+    </Grid>
+</Window>

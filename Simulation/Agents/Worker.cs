@@ -2,17 +2,19 @@
 
 public class Worker : DataAgent
 {
-    public Worker(int id, Drone currentDrone, int dataSize, float instantiateTime, List<Drone> path) : base(id,
-        currentDrone, dataSize, instantiateTime)
+    public Worker(int id, Drone currentDrone, int dataSize, float instantiateTime, List<Drone> path,
+        Package package) : base(id, currentDrone, dataSize, instantiateTime)
     {
         WorkerState = WorkerState.Sending;
         Path = path;
+        Package = package;
     }
 
     public WorkerState WorkerState { get; set; }
     public List<Drone> Path { get; set; }
+    public Package Package { get; set; }
 
-    public void Move(List<Drone> drones)
+    public override void DoAction(List<Drone> drones)
     {
         if (WorkerState == WorkerState.Sending && CurrentDrone == Path[^1])
             WorkerState = WorkerState.GoingToStart;

@@ -13,10 +13,15 @@ public abstract class DataAgent : Agent
     public int DataSize { get; set; }
     public float InstantiateTime { get; set; }
 
+    public virtual void DoAction(List<Drone> drones)
+    {
+        
+    }
+    
     public void LoadToDrone(Drone drone)
     {
         var dataLoadingProcess = new DataLoadingProcess(this, CurrentDrone, drone);
-        drone.DataLoadingProcesses.Enqueue(dataLoadingProcess);
+        drone.DataLoadingProcesses.Add(dataLoadingProcess);
 
         CurrentDrone = drone;
     }

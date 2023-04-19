@@ -1,0 +1,40 @@
+﻿<Window x:Class="SimulationUI.MapWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:local="clr-namespace:SimulationUI"
+        mc:Ignorable="d"
+        Title="MapWindow" Height="600" Width="600">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Orientation="Horizontal">
+            <TextBlock Text="Width:" Margin="10" VerticalAlignment="Center" />
+            <TextBox x:Name="WidthBox" Width="50" Margin="5" TextChanged="OnWidthChanged"/>
+            <TextBlock Text="Height:" Margin="10" VerticalAlignment="Center" />
+            <TextBox x:Name="HeightBox" Width="50" Margin="5" TextChanged="OnHeightChanged"/>
+            <TextBlock Text="Drone count:" Margin="10" VerticalAlignment="Center" />
+            <TextBox x:Name="DroneCountBox" Width="50" Margin="5" TextChanged="OnDroneCountChanged"/>
+            <Button Content="Draw random map" Click="OnDrawRandomMapButtonClicked" />
+        </StackPanel>
+
+        <StackPanel Grid.Row="1" Orientation="Horizontal">
+            <TextBlock Text="Start:" Margin="10" VerticalAlignment="Center" />
+            <TextBox x:Name="StartXBox" Width="30" Margin="5" TextChanged="OnStartXChanged"/>
+            <TextBox x:Name="StartYBox" Width="30" Margin="5" TextChanged="OnStartYChanged"/>
+            <TextBlock Text="End:" Margin="10" VerticalAlignment="Center" />
+            <TextBox x:Name="EndXBox" Width="30" Margin="5" TextChanged="OnEndXChanged"/>
+            <TextBox x:Name="EndYBox" Width="30" Margin="5" TextChanged="OnEndYChanged"/>
+            <Button Content="Draw only start and end" Click="OnDrawStartEndButtonClicked" />
+        </StackPanel>
+
+        <Border Grid.Row="2" BorderBrush="Black" BorderThickness="1">
+            <Canvas x:Name="canvas" Background="White"  Width="400" Height="400" HorizontalAlignment="Center"/>
+        </Border>
+    </Grid>
+</Window>

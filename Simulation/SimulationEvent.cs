@@ -1,13 +1,20 @@
 ﻿namespace Simulation;
 
-internal class SimulationEvent
+public class SimulationEvent
 {
-    private int _tick;
     private Action _action;
 
-    public SimulationEvent(int tick, Action action)
+    public SimulationEvent(float tick, Action action)
     {
-        _tick = tick;
         _action = action;
+        
+        Tick = tick;
+    }
+
+    public float Tick { get; }
+
+    public void Execute()
+    {
+        _action();
     }
 }

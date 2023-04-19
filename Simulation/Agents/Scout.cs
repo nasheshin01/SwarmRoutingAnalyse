@@ -4,16 +4,14 @@ public class Scout : DataAgent
 {
     private readonly float _maxDroneDistance;
     private readonly float _energyLimit;
-    private readonly DronePathConfig _dronePathConfig;
-    
+
 
     public Scout(int id, Drone currentDrone, int dataSize, float instantiateTime, float energyLimit,
-        float maxDroneDistance, DronePathConfig dronePathConfig) : base(id, currentDrone, dataSize, instantiateTime)
+        float maxDroneDistance) : base(id, currentDrone, dataSize, instantiateTime)
     {
         _energyLimit = energyLimit;
         _maxDroneDistance = maxDroneDistance;
-        _dronePathConfig = dronePathConfig;
-        
+
         Energy = energyLimit;
         ScoutState = ScoutState.Scouting;
         Path = new List<Drone>() {CurrentDrone};
@@ -23,11 +21,11 @@ public class Scout : DataAgent
     public ScoutState ScoutState { get; set; }
     public List<Drone> Path { get; set; }
 
-    public void Move(List<Drone> drones)
+    public override void DoAction(List<Drone> drones)
     {
-        if (ScoutState == ScoutState.Scouting && CurrentDrone == _dronePathConfig.EndDrone)
+        if (ScoutState == ScoutState.Scouting && CurrentDrone is EndDrone)
             ScoutState = ScoutState.GoingToStart;
-        if (ScoutState == ScoutState.GoingToStart && CurrentDrone == _dronePathConfig.StartDrone)
+        if (ScoutState == ScoutState.GoingToStart && CurrentDrone is StartDrone)
             ScoutState = ScoutState.ScoutingEnded;
         
         if (ScoutState == ScoutState.Scouting)

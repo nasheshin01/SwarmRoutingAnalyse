@@ -1,31 +1,40 @@
-﻿namespace Simulation.Agents;
+﻿using System.Drawing;
+
+namespace Simulation.Agents;
 
 public class StartDrone : Drone
 {
-    private readonly List<List<Drone>> _suitablePaths;
-    private const float LoadingSpeed = 15f;
+    private readonly List<Path> _suitablePaths;
+    private readonly float _constLoadingSpeed;
+    private int _currentPathId;
     
-    public StartDrone(int id, int x, int y) : base(id, x, y)
+    public StartDrone(int id, int x, int y, float constLoadingSpeed) : base(id, x, y)
     {
-        _suitablePaths = new List<List<Drone>>();
+        _suitablePaths = new List<Path>();
+
+        _constLoadingSpeed = constLoadingSpeed;
+        SuitablePathsUpdated = false;
     }
 
-    public override void DoAction(GridSpace gridSpace)
+    public bool TryAddNewPath(List<Drone> drones, float loadingSpeed)
     {
-        base.DoAction(gridSpace);
-    }
-
-    public bool TryAddNewPath(List<Drone> path)
-    {
-        var intersectedPaths = _suitablePaths.Where(sp => IsPathsIntersects(path, sp)).ToList();
+        if (_suitablePaths.Any(sp => sp.Drones.Count == 2) && drones.Count == 2)
+        {
+            return false;
+        }
+        
+        var path = new Path(_currentPathId, drones, loadingSpeed);
+        _currentPathId++;
+        var intersectedPaths = _suitablePaths.Where(sp => sp.IsPathIntersects(path)).ToList();
         if (!intersectedPaths.Any())
         {
             _suitablePaths.Add(path);
+            SuitablePathsUpdated = true;
             return true;
         }
         
-        var sumSpeedOfIntersectedPaths = intersectedPaths.Sum(sp => Utils.GetPathLoadingSpeed(sp, LoadingSpeed));
-        if (sumSpeedOfIntersectedPaths > Utils.GetPathLoadingSpeed(path, LoadingSpeed))
+        var sumSpeedOfIntersectedPaths = intersectedPaths.Sum(sp => sp.LoadingSpeed);
+        if (sumSpeedOfIntersectedPaths > path.LoadingSpeed)
             return false;
 
         foreach (var intersectedPath in intersectedPaths)
@@ -33,19 +42,26 @@ public class StartDrone : Drone
             _suitablePaths.Remove(intersectedPath);
         }
         _suitablePaths.Add(path);
+        SuitablePathsUpdated = true;
         return true;
     }
 
-    public bool IsSuitablePathExists => _suitablePaths.Count > 0;
-    public List<List<Drone>> SuitablePaths => _suitablePaths;
-
-    private bool IsPathsIntersects(List<Drone> path1, List<Drone> path2)
+    public void UpdateSuitablePath(int id, float loadingSpeed)
     {
-        foreach (var droneFromPath1 in path1)   
-            foreach (var droneFromPath2 in path2)
-                if (droneFromPath1 == droneFromPath2)
-                    return true;
+        var path = _suitablePaths.FirstOrDefault(sp => sp.Id == id);
+        if (path == null)
+            return;
 
-        return false;
+        path.LoadingSpeed = loadingSpeed;
+        SuitablePathsUpdated = true;
     }
+
+    public void RemoveSuitablePath(Path path)
+    {
+        _suitablePaths.Remove(path);
+    }
+
+    public bool IsSuitablePathExists => _suitablePaths.Count > 0;
+    public List<Path> SuitablePaths => _suitablePaths;
+    public bool SuitablePathsUpdated { get; set; }
 }

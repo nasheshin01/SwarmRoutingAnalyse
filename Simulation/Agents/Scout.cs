@@ -15,11 +15,13 @@ public class Scout : DataAgent
         Energy = energyLimit;
         ScoutState = ScoutState.Scouting;
         Path = new List<Drone>() {CurrentDrone};
+        WayBackLoadingTime = 0;
     }
 
     public float Energy { get; set; }
     public ScoutState ScoutState { get; set; }
     public List<Drone> Path { get; set; }
+    public float WayBackLoadingTime { get; set; }
 
     public override void DoAction(List<Drone> drones)
     {
@@ -33,7 +35,7 @@ public class Scout : DataAgent
             var closeDrones = drones.Where(drone => !(Utils.GetDroneDistance(CurrentDrone, drone) > _maxDroneDistance))
                 .ToList();
             closeDrones = closeDrones.Where(drone => !Path.Contains(drone)).ToList();
-            if (closeDrones.Count < 0)
+            if (closeDrones.Count <= 0)
             {
                 DestroyAgent();
                 return;
@@ -69,11 +71,17 @@ public class Scout : DataAgent
             }
             
             LoadToDrone(nextDrone);
-            Energy--;
+
+            WayBackLoadingTime += LastLoadingTime;
         }
         else if (ScoutState == ScoutState.ScoutingEnded)
         {
-            //Give data about found path
+            if (CurrentDrone is StartDrone startDrone)
+                startDrone.TryAddNewPath(Path, WayBackLoadingTime);
+
+            DestroyAgent();
         }
+        
+        base.DoAction(drones);
     }
 }

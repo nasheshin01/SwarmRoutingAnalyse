@@ -225,5 +225,17 @@ namespace SimulationUI
 
             _endY = null;
         }
+
+        public MapConfig GetMapConfig()
+        {
+            return new MapConfig()
+            {
+                DroneCount = (int)_droneCount,
+                MapSize = new System.Drawing.Size((int)_width, (int)_height),
+                Map = _map,
+                StartDronePoint = new System.Drawing.Point((int)_startX, (int)_startY),
+                EndDronePoint = new System.Drawing.Point((int)_endX, (int)_endY)
+            };
+        }
     }
 }

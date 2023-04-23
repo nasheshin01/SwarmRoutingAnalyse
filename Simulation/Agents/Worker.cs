@@ -2,7 +2,7 @@
 
 public class Worker : DataAgent
 {
-    public Worker(int id, Drone currentDrone, int dataSize, float instantiateTime, List<Drone> path,
+    public Worker(int id, Drone currentDrone, int dataSize, float instantiateTime, Path path,
         Package package) : base(id, currentDrone, dataSize, instantiateTime)
     {
         WorkerState = WorkerState.Sending;
@@ -11,25 +11,26 @@ public class Worker : DataAgent
     }
 
     public WorkerState WorkerState { get; set; }
-    public List<Drone> Path { get; set; }
+    public Path Path { get; set; }
     public Package Package { get; set; }
+    public float WayBackLoadingTime { get; set; }
 
     public override void DoAction(List<Drone> drones)
     {
-        if (WorkerState == WorkerState.Sending && CurrentDrone == Path[^1])
+        if (WorkerState == WorkerState.Sending && CurrentDrone == Path.Drones[^1])
             WorkerState = WorkerState.GoingToStart;
-        if (WorkerState == WorkerState.GoingToStart && CurrentDrone == Path[0])
+        if (WorkerState == WorkerState.GoingToStart && CurrentDrone == Path.Drones[0])
             WorkerState = WorkerState.SendingEnded;
 
         if (WorkerState == WorkerState.Sending)
         {
             Drone? nextDrone = null;
-            for (var i = 0; i < Path.Count; i++)
+            for (var i = 0; i < Path.Drones.Count; i++)
             {
-                if (Path[i] != CurrentDrone)
+                if (Path.Drones[i] != CurrentDrone)
                     continue;
 
-                nextDrone = Path[i + 1];
+                nextDrone = Path.Drones[i + 1];
                 break;
             }
             
@@ -44,12 +45,12 @@ public class Worker : DataAgent
         else if (WorkerState == WorkerState.GoingToStart)
         {
             Drone? nextDrone = null;
-            for (var i = 0; i < Path.Count; i++)
+            for (var i = 0; i < Path.Drones.Count; i++)
             {
-                if (Path[i] != CurrentDrone)
+                if (Path.Drones[i] != CurrentDrone)
                     continue;
 
-                nextDrone = Path[i - 1];
+                nextDrone = Path.Drones[i - 1];
                 break;
             }
 
@@ -60,10 +61,17 @@ public class Worker : DataAgent
             }
 
             LoadToDrone(nextDrone);
+            
+            WayBackLoadingTime += LastLoadingTime;
         }
         else if (WorkerState == WorkerState.SendingEnded)
         {
-            //Give data about path
+            if (CurrentDrone is StartDrone startDrone)
+                startDrone.UpdateSuitablePath(Path.Id, WayBackLoadingTime);
+
+            DestroyAgent();
         }
+        
+        base.DoAction(drones);
     }
 }

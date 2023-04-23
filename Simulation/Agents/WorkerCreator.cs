@@ -21,10 +21,13 @@ public class WorkerCreator : Agent
         _workers = new List<Worker>();
     }
 
-    public void DoAction(int tick)
+    public void DoAction(float tick)
     {
-        _unsentDatas.Add(new Data(_currentDataId, _simulationConfig.DataSize));
-        _currentDataId++;
+        if (_currentDataId < _simulationConfig.DataCount)
+        {
+            _unsentDatas.Add(new Data(_currentDataId, _simulationConfig.DataSize));
+            _currentDataId++;
+        }
 
         if (!_startDrone.IsSuitablePathExists)
             return;
@@ -44,6 +47,8 @@ public class WorkerCreator : Agent
                 _currentWorkerId++;
             }
         }
+        
+        _unsentDatas.Clear();
     }
 
     public List<Worker> ExtractCreatedWorkers()

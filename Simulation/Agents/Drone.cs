@@ -1,4 +1,6 @@
-﻿namespace Simulation.Agents;
+﻿using System.Drawing;
+
+namespace Simulation.Agents;
 
 public class Drone : Agent
 {
@@ -10,18 +12,21 @@ public class Drone : Agent
         DataLoadingProcesses = new List<DataLoadingProcess>();
     }
 
-    public virtual void DoAction(GridSpace grid)
+    public virtual void DoAction(Size boundaries)
     {
         var dx = new Random().Next(-1, 2);
         var dy = new Random().Next(-1, 2);
-        grid.MoveAgent(this, X + dx, Y + dy);
-    }
+        X += dx;
+        Y += dy;
 
-    public override void MoveAgentInSpace(int x, int y)
-    {
-        base.MoveAgentInSpace(x, y);
-        X = x;
-        Y = y;
+        if (X < 0)
+            X = 0;
+        if (X >= boundaries.Width)
+            X = boundaries.Width - 1;
+        if (Y < 0)
+            Y = 0;
+        if (Y >= boundaries.Height)
+            Y = boundaries.Height - 1;
     }
 
     public int X { get; set; }

@@ -7,96 +7,215 @@ public class MainSimulation
     private const float LoadingUpdateDelta = 0.1f;
     
     private readonly SimulationConfig _simulationConfig;
-    private readonly GridSpace _gridSpace;
     private readonly List<Scout> _scouts;
     private readonly List<Worker> _workers;
 
+    private readonly StartDrone _startDrone;
+    private readonly EndDrone _endDrone;
+    private readonly List<Drone> _drones;
+    private readonly WorkerCreator _workerCreator;
+    private readonly SimulationEventQueue _simulationEventQueue;
+
+    private int _scoutId;
+
     public MainSimulation(SimulationConfig simulationConfig)
     {
-        _simulationConfig = simulationConfig;
-        _gridSpace = new GridSpace(_simulationConfig.MapConfig.MapSize.Width,
-            _simulationConfig.MapConfig.MapSize.Height);
-
+        _simulationEventQueue = new SimulationEventQueue();
         
+        _simulationConfig = simulationConfig;
+
+        _drones = new List<Drone>();
         for (var x = 0; x < _simulationConfig.MapConfig.MapSize.Width; x++)
         {
             for (var y = 0; y < _simulationConfig.MapConfig.MapSize.Width; y++)
             {
                 if (simulationConfig.MapConfig.Map[x, y] == 1)
-                    _gridSpace.AddAgent(new Drone());
+                {
+                    var drone = new Drone(_drones.Count + 2, x, y);
+                    _drones.Add(drone);
+                }
+                else if (simulationConfig.MapConfig.Map[x, y] == 2)
+                {
+                    _startDrone = new StartDrone(0, x, y, _simulationConfig.ConstLoadingSpeed);
+                    _drones.Add(_startDrone);
+                }
+                else if (simulationConfig.MapConfig.Map[x, y] == 3)
+                {
+                    _endDrone = new EndDrone(1, x, y);
+                    _drones.Add(_endDrone);
+                }
             }
         }
 
-        var startX = _simulationConfig.MapConfig.StartDronePoint.X;
-        var startY = _simulationConfig.MapConfig.StartDronePoint.Y;
-        _gridSpace.AddAgent(new StartDrone(0, startX, startY), startX, startY);
-        
-        var endX = _simulationConfig.MapConfig.EndDronePoint.X;
-        var endY = _simulationConfig.MapConfig.EndDronePoint.Y;
-        _gridSpace.AddAgent(new EndDrone(1, endX, endY), endX, endY);
-        
-        
-        
-        for (var i = 0; i < _simulationConfig.DroneCount; i++)
-        {
-            var x = new Random().Next(0, _simulationConfig.GridWidth);
-            var y = new Random().Next(0, _simulationConfig.GridHeight);
-            _gridSpace.AddAgent(new Drone(i, x, y), x, y);
-        }
-        
-        
         _scouts = new List<Scout>();
         for (var i = 0; i < _simulationConfig.ScoutCount; i++)
         {
-            var scout = new Scout(i, dronePathConfig.StartDrone, 1, 0, 100, 20, dronePathConfig);
-            _scouts.Add(scout);
+            CreateScout();
         }
 
         _workers = new List<Worker>();
-        SimulationEventQueue = new SimulationEventQueue();
+        _workerCreator = new WorkerCreator(_startDrone, _simulationConfig, 0);
+        _simulationEventQueue.Enqueue(new SimulationEvent(0, WorkerCreatorDoAction));
+        
 
-        foreach (var drone in _gridSpace.GetAgents().Select(agent => agent as Drone))
+        foreach (var drone in _drones.Select(agent => agent))
         {
-            SimulationEventQueue.Enqueue(new SimulationEvent(SimulationEventQueue.CurrentTick + 1,
-                () => drone?.DoAction(_gridSpace)));
+            _simulationEventQueue.Enqueue(new SimulationEvent(0,
+                () => DroneDoAction(drone)));
         }
 
-        var updateLoadingProcessesEvent = new SimulationEvent(SimulationEventQueue.CurrentTick + LoadingUpdateDelta,
+        var updateLoadingProcessesEvent = new SimulationEvent(_simulationEventQueue.CurrentTick + LoadingUpdateDelta,
             UpdateLoadingProcesses);
-        SimulationEventQueue.Enqueue(updateLoadingProcessesEvent);
+        _simulationEventQueue.Enqueue(updateLoadingProcessesEvent);
+    }
+
+    private void CreateScout()
+    {
+        var scout = new Scout(_scoutId, _startDrone, _simulationConfig.ScoutSize, 0, _simulationConfig.ScoutEnergyLimit,
+            _simulationConfig.MaxDroneDistance);
+        _scouts.Add(scout);
+        _simulationEventQueue.Enqueue(new SimulationEvent(0, () => ScoutDoAction(scout)));
+        _scoutId++;
+    }
+
+    public event EventHandler<SimulationLogEventArgs> LogEventHandler;
+
+    private void WorkerCreatorDoAction()
+    {
+        _workerCreator.DoAction(_simulationEventQueue.CurrentTick);
+        var createdWorkers = _workerCreator.ExtractCreatedWorkers();
+        _workers.AddRange(createdWorkers);
+        foreach (var worker in createdWorkers)
+        {
+            LogEventHandler.Invoke(this,
+                new SimulationLogEventArgs($"Package {worker.Package.Id} of data {worker.Package.ParentData.Id} was sent.",
+                    _simulationEventQueue.CurrentTick, LogType.PackageSending));
+        }
+
+        foreach (var createdWorker in createdWorkers)
+        {
+            var simulationEvent = new SimulationEvent(_simulationEventQueue.CurrentTick, () => WorkerDoAction(createdWorker));
+            _simulationEventQueue.Enqueue(simulationEvent);
+        }
+
+        var workerCreatorEvent =
+            new SimulationEvent(_simulationEventQueue.CurrentTick + _simulationConfig.DataGeneratePeriod,
+                WorkerCreatorDoAction);
+        _simulationEventQueue.Enqueue(workerCreatorEvent);
     }
     
-    public SimulationEventQueue SimulationEventQueue { get; }
+    private void DroneDoAction(Drone drone)
+    {
+        drone.DoAction(_simulationConfig.MapConfig.MapSize);
+        _simulationEventQueue.Enqueue(new SimulationEvent(
+            _simulationEventQueue.CurrentTick + _simulationConfig.DroneMovePeriod, () => DroneDoAction(drone)));
+    }
+
+    private void ScoutDoAction(Scout scout)
+    {
+        scout.DoAction(_drones);
+        LogEventHandler.Invoke(this,
+            new SimulationLogEventArgs($"Scout {scout.Id} is on drone {scout.CurrentDrone.Id}",
+                _simulationEventQueue.CurrentTick, LogType.ScoutMove));
+
+        if (_startDrone.SuitablePathsUpdated)
+        {
+            LogEventHandler.Invoke(this,
+                new SimulationLogEventArgs($"Suitable paths updated, current count - {_startDrone.SuitablePaths.Count}",
+                    _simulationEventQueue.CurrentTick, LogType.PathFound));
+            _startDrone.SuitablePathsUpdated = false;
+        }
+        
+        if (!scout.IsDestroyed)
+            return;
+        
+        LogEventHandler.Invoke(this,
+            new SimulationLogEventArgs($"Scout {scout.Id} destroyed",
+                _simulationEventQueue.CurrentTick, LogType.ScoutMove));
+
+        _scouts.Remove(scout);
+        CreateScout();
+    }
+    
+    private void WorkerDoAction(Worker worker)
+    {
+        var isPackageNotSent = worker.WorkerState == WorkerState.Sending;
+        worker.DoAction(_drones);
+        
+        LogEventHandler.Invoke(this,
+            new SimulationLogEventArgs($"Worker {worker.Id} is on drone {worker.CurrentDrone.Id}",
+                _simulationEventQueue.CurrentTick, LogType.WorkerMove));
+
+        if (isPackageNotSent && worker.WorkerState == WorkerState.GoingToStart)
+        {
+            LogEventHandler.Invoke(this,
+                new SimulationLogEventArgs($"Package {worker.Package.Id} of data {worker.Package.ParentData.Id} was delivered. Time to deliver {_simulationEventQueue.CurrentTick - worker.InstantiateTime}",
+                    _simulationEventQueue.CurrentTick, LogType.PackageSending));
+        }
+        
+        if (!worker.IsDestroyed)
+            return;
+
+        _workers.Remove(worker);
+    }
 
     private void UpdateLoadingProcesses()
     {
-        var drones = _gridSpace.GetAgents().Cast<Drone>().ToList();
-        foreach (var drone in drones)
+        foreach (var drone in _drones)
         {
-            foreach (var dataLoadingProcess in drone.DataLoadingProcesses)
-            {
-                dataLoadingProcess.DoLoadProcess(LoadingUpdateDelta);
+            var dataLoadingProcess = drone.DataLoadingProcesses.FirstOrDefault();
+            if (dataLoadingProcess == null)
+                continue;
+            
+            dataLoadingProcess.DoLoadProcess(LoadingUpdateDelta, _simulationConfig.ConstLoadingSpeed);
                 
-                if (!dataLoadingProcess.IsLoadingEnded)
-                    continue;
+            if (!dataLoadingProcess.IsLoadingEnded)
+                continue;
 
-                var agentEvent = new SimulationEvent(SimulationEventQueue.CurrentTick,
-                    () => dataLoadingProcess.DataAgent.DoAction(drones));
-                SimulationEventQueue.Enqueue(agentEvent);
+            var dataAgent = dataLoadingProcess.DataAgent;
+            switch (dataAgent)
+            {
+                case Scout scout:
+                {
+                    var agentEvent = new SimulationEvent(_simulationEventQueue.CurrentTick, () => ScoutDoAction(scout));
+                    _simulationEventQueue.Enqueue(agentEvent);
+                    break;
+                }
+                case Worker worker:
+                {
+                    var agentEvent = new SimulationEvent(_simulationEventQueue.CurrentTick, () => WorkerDoAction(worker));
+                    _simulationEventQueue.Enqueue(agentEvent);
+                    break;
+                }
+                default:
+                    throw new ArgumentOutOfRangeException("Unknown agent type");
             }
 
-            drone.DataLoadingProcesses = drone.DataLoadingProcesses.Where(dlp => !dlp.IsLoadingEnded).ToList();
+            drone.DataLoadingProcesses.RemoveAt(0);
         }
 
-        var updateLoadingProcessesEvent = new SimulationEvent(SimulationEventQueue.CurrentTick + LoadingUpdateDelta, UpdateLoadingProcesses);
-        SimulationEventQueue.Enqueue(updateLoadingProcessesEvent);
+        var updateLoadingProcessesEvent = new SimulationEvent(_simulationEventQueue.CurrentTick + LoadingUpdateDelta, UpdateLoadingProcesses);
+        _simulationEventQueue.Enqueue(updateLoadingProcessesEvent);
     }
 
     public void Run()
     {
-        while (SimulationEventQueue.Count > 0)
+        var evenHundredTickLast = 0;
+        
+        while (_simulationEventQueue.Count > 0)
         {
-            var simulationEvent = SimulationEventQueue.Dequeue();
+            if (_simulationEventQueue.CurrentTick >= _simulationConfig.EndSimulationTick)
+                break;
+
+            if (_simulationEventQueue.CurrentTick / 100f > evenHundredTickLast)
+            {
+                LogEventHandler.Invoke(this,
+                    new SimulationLogEventArgs($"Passed abother hundred of ticks",
+                        _simulationEventQueue.CurrentTick, LogType.Info));
+                evenHundredTickLast++;
+            }
+            
+            var simulationEvent = _simulationEventQueue.Dequeue();
             simulationEvent?.Execute();
         }
     }

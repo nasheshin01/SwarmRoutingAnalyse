@@ -2,7 +2,7 @@
 
 public class SimulationEvent
 {
-    private Action _action;
+    private readonly Action _action;
 
     public SimulationEvent(float tick, Action action)
     {

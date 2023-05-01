@@ -2,7 +2,7 @@
 
 public class EndDrone : Drone
 {
-    public EndDrone(int id, int x, int y) : base(id, x, y)
+    public EndDrone(int id, int x, int y, List<Rule> rules) : base(id, x, y, rules)
     {
     }
 }

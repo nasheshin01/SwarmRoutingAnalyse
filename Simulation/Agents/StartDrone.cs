@@ -5,14 +5,12 @@ namespace Simulation.Agents;
 public class StartDrone : Drone
 {
     private readonly List<Path> _suitablePaths;
-    private readonly float _constLoadingSpeed;
     private int _currentPathId;
     
-    public StartDrone(int id, int x, int y, float constLoadingSpeed) : base(id, x, y)
+    public StartDrone(int id, int x, int y, float constLoadingSpeed, List<Rule> rules) : base(id, x, y, rules)
     {
         _suitablePaths = new List<Path>();
 
-        _constLoadingSpeed = constLoadingSpeed;
         SuitablePathsUpdated = false;
     }
 

@@ -10,7 +10,7 @@ public class WorkerCreator : Agent
     private int _currentDataId;
     private int _currentWorkerId;
 
-    public WorkerCreator(StartDrone startDrone, SimulationConfig simulationConfig, int id) : base(id)
+    public WorkerCreator(StartDrone startDrone, SimulationConfig simulationConfig, int id, List<Rule> rules) : base(id, rules)
     {
         _startDrone = startDrone;
         _simulationConfig = simulationConfig;
@@ -31,7 +31,7 @@ public class WorkerCreator : Agent
 
         if (!_startDrone.IsSuitablePathExists)
             return;
-
+        
         var packagesToSend = _unsentDatas.SelectMany(d => d.Packages).ToList();
         var packageIndex = 0;
         while (packageIndex < packagesToSend.Count)
@@ -42,7 +42,7 @@ public class WorkerCreator : Agent
                 packageIndex++;
 
                 var worker = new Worker(_currentWorkerId, _startDrone, _simulationConfig.PackageSize, tick,
-                    suitablePath, currentPackage);
+                    suitablePath, currentPackage, _simulationConfig.Rules);
                 _workers.Add(worker);
                 _currentWorkerId++;
             }

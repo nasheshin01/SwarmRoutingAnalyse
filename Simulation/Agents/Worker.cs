@@ -3,7 +3,7 @@
 public class Worker : DataAgent
 {
     public Worker(int id, Drone currentDrone, int dataSize, float instantiateTime, Path path,
-        Package package) : base(id, currentDrone, dataSize, instantiateTime)
+        Package package, List<Rule> rules) : base(id, currentDrone, dataSize, instantiateTime, rules)
     {
         WorkerState = WorkerState.Sending;
         Path = path;
@@ -67,7 +67,7 @@ public class Worker : DataAgent
         else if (WorkerState == WorkerState.SendingEnded)
         {
             if (CurrentDrone is StartDrone startDrone)
-                startDrone.UpdateSuitablePath(Path.Id, WayBackLoadingTime);
+                startDrone.UpdateSuitablePath(Path.Id, DataSize / WayBackLoadingTime);
 
             DestroyAgent();
         }

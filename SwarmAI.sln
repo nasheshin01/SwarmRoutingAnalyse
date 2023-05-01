@@ -4,6 +4,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Simulation", "Simulation\Si
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimulationUI", "SimulationUI\SimulationUI.csproj", "{CB77DDA3-7A3F-4C8A-80F6-6DC6F76BF9CC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sandbox", "Sandbox\Sandbox.csproj", "{628B3622-498C-4C7F-833E-B516529EF7DB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{CB77DDA3-7A3F-4C8A-80F6-6DC6F76BF9CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CB77DDA3-7A3F-4C8A-80F6-6DC6F76BF9CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CB77DDA3-7A3F-4C8A-80F6-6DC6F76BF9CC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{628B3622-498C-4C7F-833E-B516529EF7DB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{628B3622-498C-4C7F-833E-B516529EF7DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{628B3622-498C-4C7F-833E-B516529EF7DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{628B3622-498C-4C7F-833E-B516529EF7DB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

@@ -3,13 +3,10 @@
 public class Scout : DataAgent
 {
     private readonly float _maxDroneDistance;
-    private readonly float _energyLimit;
-
 
     public Scout(int id, Drone currentDrone, int dataSize, float instantiateTime, float energyLimit,
-        float maxDroneDistance) : base(id, currentDrone, dataSize, instantiateTime)
+        float maxDroneDistance, List<Rule> rules) : base(id, currentDrone, dataSize, instantiateTime, rules)
     {
-        _energyLimit = energyLimit;
         _maxDroneDistance = maxDroneDistance;
 
         Energy = energyLimit;
@@ -77,7 +74,7 @@ public class Scout : DataAgent
         else if (ScoutState == ScoutState.ScoutingEnded)
         {
             if (CurrentDrone is StartDrone startDrone)
-                startDrone.TryAddNewPath(Path, WayBackLoadingTime);
+                startDrone.TryAddNewPath(Path, DataSize / WayBackLoadingTime);
 
             DestroyAgent();
         }

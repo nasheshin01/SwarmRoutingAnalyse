@@ -2,7 +2,7 @@
 
 public abstract class DataAgent : Agent
 {
-    protected DataAgent(int id, Drone currentDrone, int dataSize, float instantiateTime) : base(id)
+    protected DataAgent(int id, Drone currentDrone, int dataSize, float instantiateTime, List<Rule> rules) : base(id, rules)
     {
         CurrentDrone = currentDrone;
         DataSize = dataSize;

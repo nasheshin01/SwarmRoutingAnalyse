@@ -16,4 +16,5 @@ public class SimulationConfig
     
 
     public MapConfig MapConfig;
+    public List<Rule> Rules = new();
 }

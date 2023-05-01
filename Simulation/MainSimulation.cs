@@ -31,17 +31,17 @@ public class MainSimulation
             {
                 if (simulationConfig.MapConfig.Map[x, y] == 1)
                 {
-                    var drone = new Drone(_drones.Count + 2, x, y);
+                    var drone = new Drone(_drones.Count + 2, x, y, _simulationConfig.Rules);
                     _drones.Add(drone);
                 }
                 else if (simulationConfig.MapConfig.Map[x, y] == 2)
                 {
-                    _startDrone = new StartDrone(0, x, y, _simulationConfig.ConstLoadingSpeed);
+                    _startDrone = new StartDrone(0, x, y, _simulationConfig.ConstLoadingSpeed, _simulationConfig.Rules);
                     _drones.Add(_startDrone);
                 }
                 else if (simulationConfig.MapConfig.Map[x, y] == 3)
                 {
-                    _endDrone = new EndDrone(1, x, y);
+                    _endDrone = new EndDrone(1, x, y, _simulationConfig.Rules);
                     _drones.Add(_endDrone);
                 }
             }
@@ -54,7 +54,7 @@ public class MainSimulation
         }
 
         _workers = new List<Worker>();
-        _workerCreator = new WorkerCreator(_startDrone, _simulationConfig, 0);
+        _workerCreator = new WorkerCreator(_startDrone, _simulationConfig, 0, _simulationConfig.Rules);
         _simulationEventQueue.Enqueue(new SimulationEvent(0, WorkerCreatorDoAction));
         
 
@@ -72,7 +72,7 @@ public class MainSimulation
     private void CreateScout()
     {
         var scout = new Scout(_scoutId, _startDrone, _simulationConfig.ScoutSize, 0, _simulationConfig.ScoutEnergyLimit,
-            _simulationConfig.MaxDroneDistance);
+            _simulationConfig.MaxDroneDistance, _simulationConfig.Rules);
         _scouts.Add(scout);
         _simulationEventQueue.Enqueue(new SimulationEvent(0, () => ScoutDoAction(scout)));
         _scoutId++;

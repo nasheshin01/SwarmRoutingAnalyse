@@ -1,8 +1,12 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Diagnostics;
+using System.IO;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using Simulation;
+using Newtonsoft.Json;
 
 namespace SimulationUI
 {
@@ -63,12 +67,27 @@ namespace SimulationUI
 
         private void OnRunSimulationButtonClicked(object sender, RoutedEventArgs e)
         {
-            RichTxtBoxLogs.Document.Blocks.Clear();
-            
-            _mainSimulation = new MainSimulation(_simulationConfig);
-            _mainSimulation.LogEventHandler += OnSimulationLogArrived;
+            var jsonSimulationConfig = JsonConvert.SerializeObject(_simulationConfig, Formatting.Indented);
+            using var writer = new StreamWriter(@"D:\HSE\Diplom\SwarmAIProject\settings.json");
+            writer.Write(jsonSimulationConfig);
+            writer.Close();
 
-            var simulationTask = Task.Run(_mainSimulation.Run);
+            const string pythonPath = @"D:\HSE\Diplom\SwarmAIProject\vizsim_main.py";
+            
+            var start = new ProcessStartInfo
+            {
+                FileName = "python", // path to python executable
+                Arguments = pythonPath, // path to your python script
+                UseShellExecute = false,
+                RedirectStandardOutput = true
+            };
+
+            using var process = Process.Start(start);
+            using var reader = process?.StandardOutput;
+            var result = reader?.ReadToEnd();
+
+            using var logWriter = new StreamWriter(@"D:\HSE\Diplom\SwarmAIProject\log.txt");
+            writer.Write(result);
         }
 
         private void OnSimulationLogArrived(object? sender, SimulationLogEventArgs simulationLogEventArgs)

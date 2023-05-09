@@ -35,9 +35,6 @@ class DataAgent(MovingAgent):
             self.agent_load_to = None
             new_x = self.current_drone.x
             new_y = self.current_drone.y
-            
-
-        
 
         self.move(new_x, new_y)
 

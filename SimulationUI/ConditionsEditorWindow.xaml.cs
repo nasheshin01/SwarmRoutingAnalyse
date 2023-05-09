@@ -45,4 +45,9 @@ public partial class ConditionsEditorWindow : Window
         var conditionControl = new ConditionControl(_agentType);
         _conditionControls.Add(conditionControl);
     }
+
+    private void OnRemoveConditionButtonClicked(object sender, RoutedEventArgs e)
+    {
+        _conditionControls.RemoveAt(ConditionsList.SelectedIndex);
+    }
 }

@@ -5,16 +5,18 @@ namespace SimulationUI;
 
 public class ConditionTemplate
 {
-    public ConditionTemplate(string variable, EquationType equationsType, List<string> values)
+    public ConditionTemplate(LocalizationElement variable, EquationType equationsType, List<LocalizationElement> values)
     {
         Variable = variable;
+        EquationType = equationsType;
         Equations = equationsType == EquationType.Int
-            ? new List<Equation> { Equation.Equal, Equation.NotEqual, Equation.More, Equation.Less}
-            : new List<Equation> { Equation.Equal, Equation.NotEqual};
+            ? new List<LocalizationElement> { Localizations.ConditionEquationEquals, Localizations.ConditionEquationNotEquals, Localizations.ConditionEquationMore, Localizations.ConditionEquationLess}
+            : new List<LocalizationElement> { Localizations.ConditionEquationEquals, Localizations.ConditionEquationNotEquals};
         Values = values;
     }
     
-    public string Variable { get; set; }
-    public List<Equation> Equations { get; set; }
-    public List<string> Values { get; set; }
+    public LocalizationElement Variable { get; set; }
+    public EquationType EquationType { get; }
+    public List<LocalizationElement> Equations { get; set; }
+    public List<LocalizationElement> Values { get; set; }
 }

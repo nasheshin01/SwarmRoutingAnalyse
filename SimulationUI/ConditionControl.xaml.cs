@@ -10,9 +10,9 @@ namespace SimulationUI;
 public partial class ConditionControl
 {
     private List<ConditionTemplate> _conditionTemplates;
-    private ObservableCollection<string> _variableBoxItems;
-    private ObservableCollection<Equation> _equationBoxItems;
-    private ObservableCollection<string> _valueBoxItems;
+    private ObservableCollection<LocalizationElement> _variableBoxItems;
+    private ObservableCollection<LocalizationElement> _equationBoxItems;
+    private ObservableCollection<LocalizationElement> _valueBoxItems;
 
     public ConditionControl(AgentTypeForRules agentType)
     {
@@ -22,9 +22,9 @@ public partial class ConditionControl
         if (_conditionTemplates == null)
             throw new ArgumentNullException(nameof(_conditionTemplates));
 
-        _variableBoxItems = new ObservableCollection<string>(_conditionTemplates.Select(cp => cp.Variable));
-        _equationBoxItems = new ObservableCollection<Equation>();
-        _valueBoxItems = new ObservableCollection<string>();
+        _variableBoxItems = new ObservableCollection<LocalizationElement>(_conditionTemplates.Select(cp => cp.Variable));
+        _equationBoxItems = new ObservableCollection<LocalizationElement>();
+        _valueBoxItems = new ObservableCollection<LocalizationElement>();
 
         VariableBox.ItemsSource = _variableBoxItems;
         VariableBox.SelectedIndex = 0;
@@ -40,22 +40,21 @@ public partial class ConditionControl
         if (_conditionTemplates == null)
             throw new ArgumentNullException(nameof(_conditionTemplates));
 
-        _variableBoxItems = new ObservableCollection<string>(_conditionTemplates.Select(cp => cp.Variable));
-        _equationBoxItems = new ObservableCollection<Equation>();
-        _valueBoxItems = new ObservableCollection<string>();
+        _variableBoxItems = new ObservableCollection<LocalizationElement>(_conditionTemplates.Select(cp => cp.Variable));
+        _equationBoxItems = new ObservableCollection<LocalizationElement>();
+        _valueBoxItems = new ObservableCollection<LocalizationElement>();
 
         VariableBox.ItemsSource = _variableBoxItems;
         VariableBox.SelectedIndex = 0;
         EquationBox.ItemsSource = _equationBoxItems;
         ValueBox.ItemsSource = _valueBoxItems;
 
-        VariableBox.SelectedItem = condition.Variable;
-        EquationBox.SelectedItem = condition.Equation;
+        VariableBox.Text = _variableBoxItems.First(i => i.Name == condition.Variable).LocalizedName;
+        EquationBox.Text = _equationBoxItems.First(i => i.Name == condition.Equation.ToString()).LocalizedName;
 
-        if (condition.EquationType == EquationType.Enum)
-            ValueBox.SelectedIndex = condition.Value;
-        else
-            ValueBox.Text = condition.Value.ToString();
+        ValueBox.Text = condition.EquationType != EquationType.Int
+            ? _valueBoxItems.First(i => i.Name == condition.Value).LocalizedName
+            : condition.Value;
     }
 
     private void InitializeTemplates(AgentTypeForRules agentType)
@@ -65,25 +64,33 @@ public partial class ConditionControl
             case AgentTypeForRules.Drone:
                 _conditionTemplates = new List<ConditionTemplate>
                 {
-                    new("X", EquationType.Int, new List<string>()),
-                    new("Y", EquationType.Int, new List<string>()),
-                    new("Energy", EquationType.Int, new List<string>()),
-                    new("HibernationStatus", EquationType.Enum, new List<string> { "Hibernate", "NoHibernate" })
+                    new(Localizations.ConditionVariableX, EquationType.Int, new List<LocalizationElement>()),
+                    new(Localizations.ConditionVariableY, EquationType.Int, new List<LocalizationElement>()),
+                    new(Localizations.ConditionVariableEnergy, EquationType.Int, new List<LocalizationElement>()),
+                    new(Localizations.ConditionVariableHibernationStatus, EquationType.Enum, new List<LocalizationElement> { Localizations.ConditionValueHibernate, Localizations.ConditionValueNoHibernate })
                 };
                 break;
             case AgentTypeForRules.Scout:
                 _conditionTemplates = new List<ConditionTemplate>
                 {
-                    new("Energy", EquationType.Int, new List<string>()),
-                    new("ScoutState",  EquationType.Enum, new List<string> { "Scouting", "GoingToStart", "ScoutingEnded" }),
-                    new("WayBackLoadingTime", EquationType.Int, new List<string>())
+                    new(Localizations.ConditionVariableEnergy, EquationType.Int, new List<LocalizationElement>()),
+                    new(Localizations.ConditionVariableScoutState,  EquationType.Enum, new List<LocalizationElement> { Localizations.ConditionValueScouting, Localizations.ConditionValueGoingToStart, Localizations.ConditionValueScoutingEnded }),
+                    new(Localizations.ConditionVariableIsNextDroneOutOfRadius, EquationType.Bool, new List<LocalizationElement> {Localizations.ConditionValueTrue, Localizations.ConditionValueFalse}),
+                    new(Localizations.ConditionVariableIsNextDroneInLoadingState, EquationType.Bool, new List<LocalizationElement> {Localizations.ConditionValueTrue, Localizations.ConditionValueFalse}),
+                    new(Localizations.ConditionVariableIsCurrentDroneSource, EquationType.Bool, new List<LocalizationElement> {Localizations.ConditionValueTrue, Localizations.ConditionValueFalse}),
+                    new(Localizations.ConditionVariableIsCurrentDroneDestination, EquationType.Bool, new List<LocalizationElement> {Localizations.ConditionValueTrue, Localizations.ConditionValueFalse}),
+                    new(Localizations.ConditionVariableIsNextDroneChoosed, EquationType.Bool, new List<LocalizationElement> {Localizations.ConditionValueTrue, Localizations.ConditionValueFalse}),
                 };
                 break;
             case AgentTypeForRules.Worker:
                 _conditionTemplates = new List<ConditionTemplate>
                 {
-                    new("WorkerState",  EquationType.Enum, new List<string> { "Sending", "GoingToStart", "SendingEnded" }),
-                    new("WayBackLoadingTime", EquationType.Int, new List<string>())
+                    new(Localizations.ConditionVariableWorkerState,  EquationType.Enum, new List<LocalizationElement> { Localizations.ConditionValueSending, Localizations.ConditionValueGoingToStart, Localizations.ConditionValueSendingEnded }),
+                    new(Localizations.ConditionVariableIsNextDroneOutOfRadius, EquationType.Bool, new List<LocalizationElement> {Localizations.ConditionValueTrue, Localizations.ConditionValueFalse}),
+                    new(Localizations.ConditionVariableIsNextDroneBusy, EquationType.Bool, new List<LocalizationElement> {Localizations.ConditionValueTrue, Localizations.ConditionValueFalse}),
+                    new(Localizations.ConditionVariableIsCurrentDroneSource, EquationType.Bool, new List<LocalizationElement> {Localizations.ConditionValueTrue, Localizations.ConditionValueFalse}),
+                    new(Localizations.ConditionVariableIsCurrentDroneDestination, EquationType.Bool, new List<LocalizationElement> {Localizations.ConditionValueTrue, Localizations.ConditionValueFalse}),
+                    new(Localizations.ConditionVariableIsNextDroneChosen, EquationType.Bool, new List<LocalizationElement> {Localizations.ConditionValueTrue, Localizations.ConditionValueFalse}),
                 };
                 break;
             default:
@@ -93,24 +100,26 @@ public partial class ConditionControl
 
     public RuleCondition GetResultCondition()
     {
-        var variable = (string)VariableBox.SelectedItem;
-        var equation = (Equation)EquationBox.SelectedItem;
-        var equationType = EquationType.Int;
-        
-        var isNum = int.TryParse(ValueBox.Text, out var value);
-        if (isNum)
-            return new RuleCondition(variable, equationType, equation, value);
-        
-        value = ValueBox.SelectedIndex;
-        equationType = EquationType.Enum;
+        var variable = ((LocalizationElement)VariableBox.SelectedItem).Name;
+        var equation = Enum.Parse<Equation>(((LocalizationElement)EquationBox.SelectedItem).Name);
 
-        return new RuleCondition(variable, equationType, equation, value);
+        EquationType equationType;
+        if (int.TryParse(ValueBox.Text, out _))
+        {
+            equationType = EquationType.Int;
+            return new RuleCondition(variable, equationType, equation, ValueBox.Text);
+        }
+
+        equationType = ((LocalizationElement)ValueBox.SelectedItem).Name is "True" or "False"
+                ? EquationType.Bool
+                : EquationType.Enum;
+        return new RuleCondition(variable, equationType, equation, ((LocalizationElement)ValueBox.SelectedItem).Name);
     }
 
     private void VariableSelectedChanged(object sender, SelectionChangedEventArgs e)
     {
         var conditionTemplate =
-            _conditionTemplates.FirstOrDefault(cp => cp.Variable == (string)VariableBox.SelectedItem);
+            _conditionTemplates.FirstOrDefault(cp => cp.Variable == (LocalizationElement)VariableBox.SelectedItem);
         if (conditionTemplate == null)
             throw new Exception("Condition template not found");
         
@@ -131,5 +140,7 @@ public partial class ConditionControl
             ValueBox.Text = "0";
         else
             ValueBox.SelectedIndex = 0;
-    }
+
+        ValueBox.IsEditable = conditionTemplate.EquationType == EquationType.Int;
+    }   
 }

@@ -16,6 +16,7 @@ class MovingAgent(Agent):
 
         self.model.grid.move_agent(self, (new_x, new_y))
 
+
     def get_distance(self, agent):
         x1, y1 = self.x, self.y
         x2, y2 = agent.x, agent.y

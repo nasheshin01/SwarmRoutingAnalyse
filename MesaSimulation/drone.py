@@ -2,16 +2,12 @@ from moving_agent import MovingAgent
 from enum import Enum
 import random
 from worker import Worker
-
-class HibernationStatus(Enum):
-    NoHibernate = 0
-    Hibernate = 1
+from rule_logic import check_conditions
 
 class Drone(MovingAgent):
     def __init__(self, unique_id, model, x: int, y: int, is_source: bool, is_destination: bool):
         super().__init__(unique_id, model, x, y)
-        self.energy = 100
-        self.data_loading_processes = []
+        self.energy = 10
         self.current_loading_agent = None
         self.is_source = is_source
         self.is_destination = is_destination
@@ -21,6 +17,7 @@ class Drone(MovingAgent):
         self.best_path_id = 0
         self.packages = []
         self.worker_id = 312314
+        self.hibernation_status = "NoHibernate"
 
     def step(self):
         if len(self.best_path) != 0 and len(self.packages) != 0:
@@ -29,15 +26,33 @@ class Drone(MovingAgent):
         if self.steps_to_wait != 0:
             self.steps_to_wait = self.steps_to_wait - 1
             return
+        
+        for rule in self.model.rules:
+            if rule["AgentType"] != 0:
+                continue
 
-        self.random_move((self.model.grid.width, self.model.grid.height))
+            is_conditions_are_true = check_conditions(self, rule)
+            if not is_conditions_are_true:
+                continue
+
+            if rule["Action"] == "EnableHibernation":
+                self.enable_hibernation()
+                self.model.logs.append(f"Step {self.model.current_step}: Drone {self.unique_id} enabled hibernation")
+            elif rule["Action"] == "DisableHibernation":
+                self.disable_hibernation()
+                self.model.logs.append(f"Step {self.model.current_step}: Drone {self.unique_id} disabled hibernation")
+            elif rule["Action"] == "RandomMove":
+                self.random_move((self.model.grid.width, self.model.grid.height))
+
+        self.energy += int(self.hibernation_status == "Hibernate")
+        self.energy -= int(self.hibernation_status == "NoHibernate")
         self.steps_to_wait = self.model.drone_move_period
 
     def enable_hibernation(self):
-        self.hibernation_status = HibernationStatus.Hibernate
+        self.hibernation_status = "Hibernate"
 
     def disable_hibernation(self):
-        self.hibernation_status = HibernationStatus.NoHibernate
+        self.hibernation_status = "NoHibernate"
 
     def random_move(self, boundaries):
         dx = self.random.randrange(-1, 2)
@@ -49,6 +64,7 @@ class Drone(MovingAgent):
             dy = 0
 
         self.move(self.x + dx, self.y + dy)
+
 
     def add_best_path(self, path, step_count):
         if step_count < self.best_path_step_count:

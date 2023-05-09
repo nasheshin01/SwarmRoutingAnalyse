@@ -1,21 +1,34 @@
 ﻿<Window x:Class="SimulationUI.RuleEditorWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:local="clr-namespace:Simulation"
-        xmlns:simulationUi="clr-namespace:SimulationUI"
-        Title="Rule Editor" Height="450" Width="800">
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
-
-        <!-- Rule list -->
-        <StackPanel Grid.Row="0" Orientation="Horizontal">
-            <ListBox x:Name="RulesList"/>
-            <StackPanel Margin="10">
-                <Button Content="Add Rule" Click="OnAddRuleButtonClicked"/>
-            </StackPanel>
+        Title="Настройка правил" Height="450" Width="800">
+    <StackPanel Orientation="Vertical">
+        <TabControl Name="RuleTabControl">
+            <TabItem Header="Дрон">
+                <StackPanel Orientation="Vertical">
+                    <ScrollViewer HorizontalAlignment="Left" Height="300">
+                        <ListBox x:Name="DroneRulesList" Margin="5"/>
+                    </ScrollViewer>
+                </StackPanel>
+            </TabItem>
+            <TabItem Header="Разведчик">
+                <StackPanel Orientation="Vertical">
+                    <ScrollViewer HorizontalAlignment="Left" Height="300">
+                        <ListBox x:Name="ScoutRulesList" Margin="5"/>
+                    </ScrollViewer>
+                </StackPanel>
+            </TabItem>
+            <TabItem Header="Работник">
+                <StackPanel Orientation="Vertical">
+                    <ScrollViewer HorizontalAlignment="Left" Height="300">
+                        <ListBox x:Name="WorkerRulesList" Margin="5"/>
+                    </ScrollViewer>
+                </StackPanel>
+            </TabItem>
+        </TabControl>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="5">
+            <Button Content="Добавить новое правило" Click="OnAddRuleButtonClicked" Margin="5"/>
+            <Button Content="Удалить выбранное правило" Click="OnDeleteRuleButtonClicked" Margin="5"/>
         </StackPanel>
-    </Grid>
+    </StackPanel>
 </Window>

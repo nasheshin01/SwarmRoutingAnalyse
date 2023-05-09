@@ -5,20 +5,14 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:local="clr-namespace:SimulationUI"
         mc:Ignorable="d"
-        Title="ConditionEditorWindow" Height="450" Width="800">
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
-
-        <!-- Rule list -->
-        <StackPanel Grid.Row="0" Orientation="Horizontal">
-            <ListBox x:Name="ConditionsList">
-            </ListBox>
-            <StackPanel Margin="10">
-                <Button Content="Add Rule" Click="OnAddConditionButtonClicked"/>
-            </StackPanel>
+        Title="Настройка условий" Height="450" Width="420">
+    <StackPanel Orientation="Vertical">
+        <ScrollViewer HorizontalAlignment="Left" Height="300">
+            <ListBox x:Name="ConditionsList" Margin="5"/>
+        </ScrollViewer>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="5">
+            <Button Content="Добавить новое условие" Click="OnAddConditionButtonClicked" Margin="5"/>
+            <Button Content="Удалить выбранное условие" Click="OnRemoveConditionButtonClicked" Margin="5"/>
         </StackPanel>
-    </Grid>
+    </StackPanel>
 </Window>

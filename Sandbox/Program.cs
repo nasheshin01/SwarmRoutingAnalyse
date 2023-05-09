@@ -11,10 +11,7 @@ while (true)
 
     Console.WriteLine("Enter action template (e.g. 'Y += 1'): ");
     var actionTemplate = Console.ReadLine();
-
-    // Create Rule object from user input
-    var rule = new DroneRule(conditionTemplate, actionTemplate);
-    var tmp = rule.Condition(drone);
+    
     
     Console.WriteLine("Rule added successfully. Add another rule? (Y/N)");
     var addAnotherRule = Console.ReadLine();

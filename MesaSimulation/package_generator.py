@@ -3,8 +3,12 @@ from mesa import Agent, Model
 
 class Package:
 
-    def __init__(self, id) -> None:
+    def __init__(self, id, step) -> None:
         self.id = id
+        self.creation_step = step
+        self.received_step = 0
+        self.is_lost = False
+        self.is_received = False
 
 
 class PackageGenerator(Agent):
@@ -22,7 +26,9 @@ class PackageGenerator(Agent):
             return
         
         self.package_id += 1
-        self.source_drone.packages.append(Package(self.package_id))
+        package = Package(self.package_id, self.model.current_step)
+        self.model.packages.append(package)
+        self.source_drone.packages.append(package)
         self.steps_to_generate_package = self.model.data_generate_period
 
         self.model.logs.append(f"Step {self.model.current_step}: Package {self.package_id} was generated")

@@ -12,8 +12,8 @@
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
-        <ComboBox Grid.Column="0" Name="VariableBox" SelectionChanged="VariableSelectedChanged"/>
-        <ComboBox Grid.Column="1" Name="EquationBox"/>
-        <ComboBox Grid.Column="2" Name="ValueBox" IsEditable="True"/>
+        <ComboBox Grid.Column="0" Name="VariableBox" SelectionChanged="VariableSelectedChanged" DisplayMemberPath="LocalizedName" Width="160"  Margin="5"/>
+        <ComboBox Grid.Column="1" Name="EquationBox" DisplayMemberPath="LocalizedName" Width="40"  Margin="5"/>
+        <ComboBox Grid.Column="2" Name="ValueBox" IsEditable="True" DisplayMemberPath="LocalizedName" Width="130" Margin="5"/>
     </Grid>
 </UserControl>

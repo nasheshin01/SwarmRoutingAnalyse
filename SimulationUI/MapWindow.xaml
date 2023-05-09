@@ -5,36 +5,42 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:local="clr-namespace:SimulationUI"
         mc:Ignorable="d"
-        Title="MapWindow" Height="600" Width="600">
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
+        Title="Настройка карты" Height="540" Width="750">
+    <StackPanel Orientation="Horizontal">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
 
-        <StackPanel Grid.Row="0" Orientation="Horizontal">
-            <TextBlock Text="Width:" Margin="10" VerticalAlignment="Center" />
-            <TextBox x:Name="WidthBox" Width="50" Margin="5" TextChanged="OnWidthChanged"/>
-            <TextBlock Text="Height:" Margin="10" VerticalAlignment="Center" />
-            <TextBox x:Name="HeightBox" Width="50" Margin="5" TextChanged="OnHeightChanged"/>
-            <TextBlock Text="Drone count:" Margin="10" VerticalAlignment="Center" />
-            <TextBox x:Name="DroneCountBox" Width="50" Margin="5" TextChanged="OnDroneCountChanged"/>
-            <Button Content="Draw random map" Click="OnDrawRandomMapButtonClicked" />
+            <TextBlock Grid.Row="0" Grid.Column="0" Text="Размер стороны:" Margin="10" VerticalAlignment="Center" />
+            <TextBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" x:Name="WidthBox" Width="50" Margin="5" TextChanged="OnWidthChanged"/>
+            <TextBlock Grid.Row="1" Grid.Column="0" Text="Кол-во дронов:" Margin="10" VerticalAlignment="Center" />
+            <TextBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" x:Name="DroneCountBox" Width="50" Margin="5" TextChanged="OnDroneCountChanged"/>
+            <TextBlock Grid.Row="2" Grid.Column="0" Text="Позиция начального дрона (X, Y):" Margin="10" VerticalAlignment="Center" />
+            <TextBox Grid.Row="2" Grid.Column="1" x:Name="StartXBox" Width="30" Margin="5" TextChanged="OnStartXChanged"/>
+            <TextBox Grid.Row="2" Grid.Column="2" x:Name="StartYBox" Width="30" Margin="5" TextChanged="OnStartYChanged"/>
+            <TextBlock Grid.Row="3" Grid.Column="0" Text="Позиция конечного дрона (X, Y):" Margin="10" VerticalAlignment="Center" />
+            <TextBox Grid.Row="3" Grid.Column="1" x:Name="EndXBox" Width="30" Margin="5" TextChanged="OnEndXChanged"/>
+            <TextBox Grid.Row="3" Grid.Column="2" x:Name="EndYBox" Width="30" Margin="5" TextChanged="OnEndYChanged"/>
+        </Grid>
+        
+        <StackPanel Orientation="Vertical">
+            <Border BorderBrush="Black" BorderThickness="1" Margin="10">
+                <Canvas x:Name="Canvas" Background="White"  Width="400" Height="400" HorizontalAlignment="Center" Margin="10"/>
+            </Border>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="Отрисовать:" Margin="10" VerticalAlignment="Center" />
+                <Button Content="Обычные дроны (случайно)" Margin="10" Click="OnDrawRandomMapButtonClicked" />
+                <Button Content="Начальный и конечный дрон"  Margin="10" Click="OnDrawStartEndButtonClicked" />
+            </StackPanel>
         </StackPanel>
-
-        <StackPanel Grid.Row="1" Orientation="Horizontal">
-            <TextBlock Text="Start:" Margin="10" VerticalAlignment="Center" />
-            <TextBox x:Name="StartXBox" Width="30" Margin="5" TextChanged="OnStartXChanged"/>
-            <TextBox x:Name="StartYBox" Width="30" Margin="5" TextChanged="OnStartYChanged"/>
-            <TextBlock Text="End:" Margin="10" VerticalAlignment="Center" />
-            <TextBox x:Name="EndXBox" Width="30" Margin="5" TextChanged="OnEndXChanged"/>
-            <TextBox x:Name="EndYBox" Width="30" Margin="5" TextChanged="OnEndYChanged"/>
-            <Button Content="Draw only start and end" Click="OnDrawStartEndButtonClicked" />
-        </StackPanel>
-
-        <Border Grid.Row="2" BorderBrush="Black" BorderThickness="1">
-            <Canvas x:Name="canvas" Background="White"  Width="400" Height="400" HorizontalAlignment="Center"/>
-        </Border>
-    </Grid>
+    </StackPanel>
 </Window>

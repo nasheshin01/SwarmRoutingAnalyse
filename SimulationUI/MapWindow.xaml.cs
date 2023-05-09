@@ -40,7 +40,6 @@ namespace SimulationUI
             InitializeComponent();
 
             WidthBox.Text = _width.ToString();
-            HeightBox.Text = _height.ToString();
             DroneCountBox.Text = _droneCount.ToString();
             StartXBox.Text = _startX.ToString();
             StartYBox.Text = _startY.ToString();
@@ -52,12 +51,12 @@ namespace SimulationUI
 
         private Tuple<int, int> TransformXy(int x, int y)
         {
-            return new Tuple<int, int>((int)((x / (float)_width) * 400), (int)((y / (float)(_height)) * 400));
+            return new Tuple<int, int>((int)((x / (float)_width) * 400 + 20), (int)((y / (float)(_height)) * 400 + 20));
         }
 
         private void DrawMap()
         {
-            canvas.Children.Clear();
+            Canvas.Children.Clear();
             for (var x = 0; x < _width; x++)
             {
                 for (var y = 0; y < _height; y++)
@@ -87,7 +86,7 @@ namespace SimulationUI
 
                     Canvas.SetLeft(dot, absX - size / 2f);
                     Canvas.SetTop(dot, absY - size / 2f);
-                    canvas.Children.Add(dot);
+                    Canvas.Children.Add(dot);
                 }
             }
         }
@@ -112,31 +111,17 @@ namespace SimulationUI
             }
         }
 
-        private void BtnDrawDots_Click(object sender, RoutedEventArgs e)
-        {
-        }
-
-        private void OnHeightChanged(object sender, TextChangedEventArgs e)
-        {
-            if (int.TryParse(HeightBox.Text, out var height))
-            {
-                _height = height;
-                return;
-            }
-
-            _height = null;
-
-        }
-
         private void OnWidthChanged(object sender, TextChangedEventArgs e)
         {
             if (int.TryParse(WidthBox.Text, out var width))
             {
                 _width = width;
+                _height = width;
                 return;
             }
 
             _width = null;
+            _height = null;
         }
 
         private void OnDroneCountChanged(object sender, TextChangedEventArgs e)

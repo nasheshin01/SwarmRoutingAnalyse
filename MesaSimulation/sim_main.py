@@ -50,10 +50,34 @@ if __name__ == "__main__":
      with open("settings.json", 'r') as file:
         config = json.load(file)
 
-        map_size = int(str.split(config["MapConfig"]["MapSize"], ',')[0])
+        step_count = config["EndSimulationTick"]
 
-        canvas = CanvasGrid(agent_portrayal, map_size, map_size, 500, 500)
-        server = ModularServer(FANET, [canvas, text_display], "Random Walk Model", {"config": config})
-        server.port = 8522
-        print(2)
-        server.launch()
+        model = FANET(config)
+
+        for i in range(int(step_count)):
+            model.step()
+
+
+        received_count = 0
+        lost_count = 0
+        not_sent_packages = 0
+        step_sum = 0
+        for package in model.packages:
+            received_count += int(package.is_received)
+            lost_count += int(package.is_lost)
+            if package.is_received:
+                step_sum += package.received_step - package.creation_step
+
+            if not package.is_received and not package.is_lost:
+                not_sent_packages += 1
+
+        
+
+        with open("out.txt", 'w') as out:
+            out.write(str(received_count) + '\n')
+            out.write(str(lost_count) + '\n')
+            out.write(str(not_sent_packages) + '\n')
+            out.write(str(step_sum / len(model.packages)) + '\n')
+        
+
+        

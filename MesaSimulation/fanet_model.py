@@ -26,9 +26,10 @@ class FANET(Model):
         self.const_loading_speed = config["ConstLoadingSpeed"]
         self.init_map = config["MapConfig"]["Map"]
         self.map_size = int(str.split(config["MapConfig"]["MapSize"], ',')[0])
+        self.rules = config["Rules"]
 
 
-        # Initualize simulation
+        # Initialize simulation
         self.grid = MultiGrid(self.map_size, self.map_size, torus=True)
         self.schedule = RandomActivation(self)
         self.drones = []
@@ -62,6 +63,7 @@ class FANET(Model):
             self.schedule.add(scout)
 
         self.schedule.add(PackageGenerator(1313141, self, source_drone))
+        self.packages = []
         self.logs = []
         self.current_step = 0
 
